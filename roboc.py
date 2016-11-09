@@ -3,11 +3,11 @@
 import os
 from rmap import Rmap
 from rgame import Rgame
-from rfunctions import rinputchoice
+from rfunctions import rinputchoice, rloadsave, rdumpsave, rchoicemap, rloadmap, rchecksave
 import pickle
 clear = "\n" * 100
 
-"""Roboc - v0.1 - by Bibi"""
+"""Roboc - v1.1 - by Bibi"""
 # commentaires de correction plus bas
 
 print(clear)
@@ -17,53 +17,17 @@ print()
 roboc_user=input("Merci de renseigner votre nom : ")
 
 # Récupération des sauvegardes existantes
-try:
-	with open('roboc_save_file','rb') as saves_file:
-		saves_depickler=pickle.Unpickler(saves_file)
-		rsave=saves_depickler.load()
 # si le fichier de sauvegarde n'existe pas, on en crée un vide
-except FileNotFoundError:
-	with open('roboc_save_file','wb') as saves_file:
-		saves_pickler=pickle.Pickler(saves_file)
-		rsave=dict()
-		saves_pickler.dump(rsave)
+rsave=rloadsave()
 
 # Choix de la carte (dans le dossier "cartes")
-liste_cartes=dict()
-print("\nVoici la liste des cartes disponibles :")
-nb_map=0
-for n,m in enumerate([i for i in os.listdir('cartes') if i.endswith('.txt')]):
-	print(n+1,m[:-4])
-	liste_cartes[n+1]=m
-nb_map=input("\nMerci de renseigner le numero correspondant à une carte ci-dessus : ")
-while int(nb_map) not in liste_cartes:
-	print(clear)
-	print("\nVoici la liste des cartes disponibles :")
-	for n,m in enumerate([i for i in os.listdir('cartes') if i.endswith('.txt')]):
-		print(n+1,m[:-4])
-	nb_map=input("\nMerci de renseigner le numero correspondant à une carte ci-dessus : ")
+chosenmap=rchoicemap()
 
-with open("cartes/"+liste_cartes[int(nb_map)],"r") as raw_carte_file:
-	raw_carte=raw_carte_file.read()
+# Chargement de la carte choisie en format texte
+raw_carte=rloadmap(chosenmap)
 
 # Verification de la présence d'une sauvegarde sur la carte
-if liste_cartes[int(nb_map)] in rsave:
-	print("\nLe joueur",rsave[liste_cartes[int(nb_map)]]._player,"a déjà une partie en cours pour la carte",liste_cartes[int(nb_map)],'.')
-	answer_existing_map=input("Voulez-vous la charger (O/N) ?")
-	while answer_existing_map.upper() not in ('O','N'):
-		answer_existing_map=input("\nMerci de répondre par oui (O) ou non (N) :")
-	# si le joueur veut reprendre une partie, on charge celle-ci
-	if answer_existing_map.upper()=='O':
-		par=rsave[liste_cartes[int(nb_map)]]
-		par._player=roboc_user
-	# sinon, on supprime la sauvegarde et on recommence une nouvelle partie
-	else:
-		del rsave[liste_cartes[int(nb_map)]]
-		roboc_carte=Rmap(raw_carte)
-		par=Rgame(roboc_user,roboc_carte)
-else:
-	roboc_carte=Rmap(raw_carte)
-	par=Rgame(roboc_user,roboc_carte)
+par=rchecksave(chosenmap, rsave, roboc_user)
 
 print(clear)
 
@@ -79,18 +43,13 @@ while not par.victory and not isend:
 			i+=1
 
 	# Sauvegarde après chaque coup
-	rsave[liste_cartes[int(nb_map)]]=par
-	with open("roboc_save_file","wb") as saves:
-		saves_pickler=pickle.Pickler(saves)
-		saves_pickler.dump(rsave)
+	rdumpsave(par,rsave,chosenmap)
 
 # En condition de victoire, on efface la partie de la sauvegarde & on sauvegarde
 if par.victory:
-	del rsave[liste_cartes[int(nb_map)]]
+	del rsave[chosenmap]
 
-	with open("roboc_save_file","wb") as saves:
-		saves_pickler=pickle.Pickler(saves)
-		saves_pickler.dump(rsave)
+	rdumpsave(par,rsave,None)
 
 	# On affiche et on quitte
 	print(par)
