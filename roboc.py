@@ -1,7 +1,9 @@
 # -*-coding:utf-8 -*
 
 import os
-from rclasses import rmap,partie
+from rmap import Rmap
+from rgame import Rgame
+from rfunctions import rinputchoice
 import pickle
 clear = "\n" * 100
 
@@ -57,42 +59,24 @@ if liste_cartes[int(nb_map)] in rsave:
 	# sinon, on supprime la sauvegarde et on recommence une nouvelle partie
 	else:
 		del rsave[liste_cartes[int(nb_map)]]
-		roboc_carte=rmap(raw_carte)
-		par=partie(roboc_user,roboc_carte)
+		roboc_carte=Rmap(raw_carte)
+		par=Rgame(roboc_user,roboc_carte)
 else:
-	roboc_carte=rmap(raw_carte)
-	par=partie(roboc_user,roboc_carte)
+	roboc_carte=Rmap(raw_carte)
+	par=Rgame(roboc_user,roboc_carte)
 
 print(clear)
 
-# Boucle permettant de jouer les coups. Elle attend que l'instance de la classe partie lui renvoie un _statut=True
-while not par._statut:
+ # Boucle permettant de jouer les coups. Elle attend que l'attribut "victory" de la partie (objet Rgame) soit vrai
+isend=False
+while not par.victory and not isend:
 	print(par)
-	action_conforme=False
-	while not action_conforme:
-		rinput=input("Action ? ")
-		print(clear)
-		# Test sur l'action utilisateur : action type "N" ou "NX"
-		if len(rinput)==1:
-			# Sortie du jeu
-			if rinput.upper()=='Q':
-				print('')
-				raise UserWarning("Fin de la partie... Ne vous inquiètez pas, votre progression est sauvegardée !")
-			# On déplace le roboc d'une case
-			action_conforme=True
-			par.mouv(rinput.upper())
-		else:
-			try:
-				int(rinput[1:])
-			except ValueError:
-				print("Merci de rentrer une action conforme :\n- N/S/E/O pour vous déplacer d\'une case,\n- N/S/E/O+X pour vous déplacer de X cases (ex: N3 ou O2)\n- Q pour quitter\n")
-				break
-			#On déplace le roboc de X cases
-			i=0
-			while i!=int(rinput[1:]):
-				par.mouv(rinput[0].upper())
-				i+=1
-			action_conforme=True
+	isend, action, nb , dir_action=rinputchoice()
+	if not isend:
+		i=0
+		while i<nb:
+			par.raction(action, dir_action)
+			i+=1
 
 	# Sauvegarde après chaque coup
 	rsave[liste_cartes[int(nb_map)]]=par
@@ -101,17 +85,18 @@ while not par._statut:
 		saves_pickler.dump(rsave)
 
 # En condition de victoire, on efface la partie de la sauvegarde & on sauvegarde
-del rsave[liste_cartes[int(nb_map)]]
+if par.victory:
+	del rsave[liste_cartes[int(nb_map)]]
 
-with open("roboc_save_file","wb") as saves:
-	saves_pickler=pickle.Pickler(saves)
-	saves_pickler.dump(rsave)
+	with open("roboc_save_file","wb") as saves:
+		saves_pickler=pickle.Pickler(saves)
+		saves_pickler.dump(rsave)
 
-# On affiche et on quitte
-print(par)
-print('')
-print("Victoire !")
-input("Appuyez sur 'Entrée pour quitter...")
+	# On affiche et on quitte
+	print(par)
+	print('')
+	print("Victoire !")
+	input("Appuyez sur 'Entrée pour quitter...")
 
 #Le travail est bien réalisé et correspond aux consignes de l'exercice. Globalement on sent une bonne maitrise du cours jusque là. Seul bémol: la modularité. En effet, on a bien un découpage en classes et modules mais là c'est vraiment minime et cela aurait nécéssité d'étendre un peu plus le modèle objet (une classe carte, une classe pour les sauvegardes par exemple...)
 

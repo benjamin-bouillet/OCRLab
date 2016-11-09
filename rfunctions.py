@@ -87,7 +87,7 @@ def rinputchoice():
 	error_case=str("Merci de rentrer une action conforme :\n- N/S/E/O pour vous déplacer d\'une case,\n- N/S/E/O+X pour vous déplacer de X cases (ex: N3 ou O2)\n- Q pour quitter\n")
 
 	isend = False
-	action, nb  = None, None
+	action, nb  = None, 1
 	conform_action = False
 	dir_act=None
 
@@ -104,19 +104,19 @@ def rinputchoice():
 				elif rinput.upper() in ('N','S','E','O','W'):
 					assert type(rinput)==str
 					action='D'
-					dir_act=rinput
+					dir_act=rinput.upper()
 					nb=1
 				else:
 					raise ValueError
 				conform_action=True
 			elif rinput[0].upper() in ('M','P'):
-				action=rinput[0]
-				dir_act=rinput[1]
+				action=rinput[0].upper()
+				dir_act=rinput[1].upper()
 				nb=1
 				conform_action=True
 			elif rinput[0].upper() in ('N','S','E','O','W'):
 				action='D'
-				dir_act=rinput[0]
+				dir_act=rinput[0].upper()
 				nb=int(rinput[1:])
 				conform_action=True
 			else:
@@ -130,4 +130,4 @@ def rinputchoice():
 		except SyntaxError:
 			pass
 			print(error_case)
-	return (isend,action.upper(),nb,dir_act.upper())
+	return (isend,action,nb,dir_act)
