@@ -1,7 +1,8 @@
 # -*-coding:utf-8 -*
 
 from rsquare import Rsquare
-from robstacles import Rwall, Rdoor, Ropponent, Rexit
+from robstacles import Rwall, Rdoor, Rplayer, Rexit
+import random
 
 class Rmap:
     """Classe permettant la gestion des cartes du Roboc Game"""
@@ -18,7 +19,7 @@ class Rmap:
         obs_corresp['O']= Rwall()
         obs_corresp[' ']= Rsquare()   
         obs_corresp['U']= Rexit()
-        obs_corresp['P']= Ropponent()
+        # obs_corresp['P']= Rplayer() \\\ Non fonctionnel depuis le fonctionnement multi-joueurs
         obs_corresp['.']= Rdoor()        
 
         # Construction de la map dans un dictionnaire
@@ -64,6 +65,11 @@ class Rmap:
         except KeyError:
             print("Ces coordonnees ('[colonnes,lignes]') sont en dehors de la carte ! La carte fait",self.nmax+1,"colonnes et",self.mmax+1,"lignes. Attention, les coordonnees commencent à 0.")
 
+    def __setitem__(self,coord,rtype):
+        """ Méthode spéciale permettant la modification d'une case de la carte"""
+
+        self._obj[coord]=rtype
+
     def __repr__(self):
         """Methode de representation graphique de la carte"""
 
@@ -75,3 +81,16 @@ class Rmap:
 
         return rmapstr
 
+    def randposition(self , *players_position):
+        """Méthode renvoyant des coordonnées vides faisant partie de la partie, excluant les positions des joueurs déjà présents"""
+
+        (coord1,coord2)=(0,0)
+
+        if players_position==():
+            players_position=((-1,-1),)
+
+        while (type(self[coord1,coord2])!=Rsquare) or ((coord1,coord2) in players_position):
+            coord1=random.randint(0,self.nmax)
+            coord2=random.randint(0,self.mmax)
+
+        return (coord1,coord2)

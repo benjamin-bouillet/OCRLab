@@ -86,18 +86,18 @@ class Rdoor(Rsquare):
 
         return (confaction, message)
 
-class Ropponent(Rsquare):
-    """Classe définissant le comportement d'un joueur adverse"""
+class Rplayer(Rsquare):
+    """Classe définissant le comportement d'un joueur"""
 
     def __repr__(self):
-        """Methode de representation graphique d'un joueur adverse"""
+        """Methode de representation graphique d'un joueur"""
 
         rsquarerepr='P'
 
         return rsquarerepr
 
     def mouv(self, coord, action):
-        """ Méthode de comportement en cas de déplacement vers le Ropponent"""
+        """ Méthode de comportement en cas de déplacement vers le Rplayer"""
 
         return (False, coord, "Ne marchez pas sur les pieds de votre adversaire !")
 
