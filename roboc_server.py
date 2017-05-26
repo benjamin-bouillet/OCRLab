@@ -7,7 +7,7 @@ from rnetwork import serv_init, serv_term, serv_listen
 clear = "\n" * 100
 
 """Roboc - v2 - by Bibi"""
-# commentaires de correction plus bas
+# commentaires de correction a la fin du script
 
 print(clear)
 print("Bienvenue dans Roboc !")
@@ -54,3 +54,6 @@ if par.victory:
 	print('')
 	print("Victoire !")
 	input("Appuyez sur 'Entrée pour quitter...")
+
+# multi-joueur
+# avec interface

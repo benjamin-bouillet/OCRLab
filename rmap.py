@@ -13,14 +13,7 @@ class Rmap:
         self._obj=dict()
 
         if type(bmap)!=str:
-            raise TypeError("Erreur de création d'instance : la carte doit être une string")
-
-        obs_corresp=dict()
-        obs_corresp['O']= Rwall()
-        obs_corresp[' ']= Rsquare()   
-        obs_corresp['U']= Rexit()
-        # obs_corresp['P']= Rplayer() \\\ Non fonctionnel depuis le fonctionnement multi-joueurs
-        obs_corresp['.']= Rdoor()        
+            raise TypeError("Erreur de création d'instance : la carte doit être une string")     
 
         # Construction de la map dans un dictionnaire
         self.pos_depart=tuple()
@@ -32,15 +25,20 @@ class Rmap:
                 m+=1
                 n=0
             else:
-                try:
-                    self._obj[n,m]=obs_corresp[j]
-                except KeyError:
+                # CASE sur J !!
+                if j=='O':
+                    self._obj[n,m]=Rwall()
+                elif j==' ':
                     self._obj[n,m]=Rsquare()
-                if j=='X':
-                    self.pos_depart=(n,m)
-                if j=='U':
+                elif j=='.':
+                    self._obj[n,m]=Rdoor()
+                elif j=='U':
+                    self._obj[n,m]=Rexit()
                     self.pos_sortie.append((n,m))
-                # print(n,m,self._obj[n,m])
+                elif j=='X':
+                    # Dans la version multi-joueur, on ignore le 'X' de la carte qui représente la position de départ dans un jeu solo
+                    self._obj[n,m]=Rsquare()
+                    self.pos_depart=(n,m)
                 n+=1
         # print('La position de depart est : ',self.pos_depart)
         # print('Les positions de sortie sont :',self.pos_sortie)

@@ -2,6 +2,7 @@
 
 from rnetwork import client_init, client_instr, client_term
 
+clear = "\n" * 100
 input("Cote client. Initialisation...")
 
 # Initialisation de la connexion avec le serveur

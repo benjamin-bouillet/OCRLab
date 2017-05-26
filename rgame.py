@@ -69,6 +69,7 @@ class Rgame:
             if pos_dir[0]<0 or pos_dir[1]<0 or pos_dir[0]>self.rmapu.nmax or pos_dir[1]>self.rmapu.mmax:
                 print('Votre robot est déjà aux frontières du réel...\n')
             else:
+                # On vérifie si la destination (pos_dir) est occupée par un joueur
                 if pos_dir in self.players_positions.values():
                     (self.victory, confaction, self.players_positions[joueur], mmessage)=virtual_opp.access(pposition,action)
                     print(mmessage)
