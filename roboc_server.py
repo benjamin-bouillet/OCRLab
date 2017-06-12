@@ -3,16 +3,16 @@
 from rmap import Rmap
 from rgame import Rgame
 from rfunctions import rinputchoice_net, rchoicemap, rloadmap
-from rnetwork import serv_init, serv_term, serv_listen
+from rnetwork import serv_term, serv_listen
+
+import select
+
 clear = "\n" * 100
 
 """Roboc - v2 - by Bibi"""
-# commentaires de correction a la fin du script
 
-print(clear)
-print("Bienvenue dans Roboc !")
-print("Le but du jeu est d'amener votre roboc vers la sortie (U)")
-print()
+# print(clear)
+print("Bienvenue dans Roboc")
 
 # Choix de la carte (dans le dossier "cartes")
 chosenmap=rchoicemap()
@@ -21,16 +21,46 @@ chosenmap=rchoicemap()
 raw_carte=rloadmap(chosenmap)
 
 # Création de la carte
-map=Rmap(raw_carte)
-par=Rgame(map)
+map = Rmap(raw_carte)
+par = Rgame(map)
 
-# ajout d'un joueur (temporaire)
-par.add_player("Ben")
+# On démarre le serveur réseau et on le met à l'écoute de connexions entrantes
+par.init_serveur()
 
-# Initilisation du serveur
-main_connection, connection_with_client , infos_connexion = serv_init()
+# On accepte les connexions entrantes et on crée les joueurs associés, jusqu'à ce qu'un joueur démarre la partie
+par.accept_joueurs()
 
-print(clear)
+isend=False
+while not par.victory and not isend:
+	for client_joueur in par.clients_connectes:
+		#while not instr_client:
+		client_a_lire = []
+		try:
+			# On récupère la liste des connexions des joueurs connectés
+			liste_socket_connectes = (o.socket_joueur for o in par.clients_connectes)
+			# On cherche les messages en attente dans cette liste
+			clients_a_lire, wlist, rlist = select.select(liste_socket_connectes, [], [], 0.05)
+		except select.error:
+			pass
+		else:
+			# On parcourt la liste des clients à lire
+			for client in clients_a_lire:
+				# On vérifie si le joueur écouté est le joueur qui doit jouer
+				if client == client_joueur.socket_joueur:
+					print(par)
+					# Si c'est le cas, on fait avancer le jeu avec son action
+					isend, action, nb , dir_action = rinputchoice_net(client_joueur.socket_joueur)
+				else:
+					# Sinon, on écoute pour effacer le message en attente, mais on ne fait rien de cette instruction
+					msg_recu = serv_listen(connection_with_client)
+					#client_instr
+					print("ce n'est pas votre tour !")
+
+
+
+
+
+
 
  # Boucle permettant de jouer les coups. Elle attend que l'attribut "victory" de la partie (objet Rgame) soit vrai
 isend=False

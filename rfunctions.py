@@ -82,56 +82,6 @@ def rchecksave(chosen_map, rsave, roboc_user):
 
 	return par
 
-def rinputchoice():
-	"""Fonction de récupération du choix de l'utilisateur. Renvoie un tuple (isend,action,nb). isend est True si le joueur décide de s'arrêter. direct contient la direction de déplacement. nb contient le nombre de case de déplacement."""
-
-	error_case=str("Merci de rentrer une action conforme :\n- N/S/E/O pour vous déplacer d\'une case,\n- N/S/E/O+X pour vous déplacer de X cases (ex: N3 ou O2)\n- Q pour quitter\n")
-
-	isend = False
-	action, nb  = None, 1
-	conform_action = False
-	dir_act=None
-
-	while not conform_action:
-		try:
-			rinput=input("Action ? ")
-			print(clear)
-			# Test sur l'action utilisateur : action type "N" ou "NX"
-			if len(rinput)==1:
-				# Sortie du jeu
-				if rinput.upper()=='Q':
-					print("Fin de la partie... Ne vous inquiètez pas, votre progression est sauvegardée !")
-					isend=True
-				elif rinput.upper() in ('N','S','E','O','W'):
-					assert type(rinput)==str
-					action='D'
-					dir_act=rinput.upper()
-					nb=1
-				else:
-					raise ValueError
-				conform_action=True
-			elif rinput[0].upper() in ('M','P'):
-				action=rinput[0].upper()
-				dir_act=rinput[1].upper()
-				nb=1
-				conform_action=True
-			elif rinput[0].upper() in ('N','S','E','O','W'):
-				action='D'
-				dir_act=rinput[0].upper()
-				nb=int(rinput[1:])
-				conform_action=True
-			else:
-				raise ValueError
-		except NameError:
-			pass
-			print(error_case)
-		except ValueError:
-			pass
-			print(error_case)
-		except SyntaxError:
-			pass
-			print(error_case)
-	return (isend,action,nb,dir_act)
 
 def rinputchoice_net(connection_with_client):
 	"""Fonction de récupération du choix de l'utilisateur en réseau. Renvoie un tuple (isend,action,nb). isend est True si le joueur décide de s'arrêter. direct contient la direction de déplacement. nb contient le nombre de case de déplacement."""
